@@ -1,0 +1,17 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'kafka-broker'
+    scrape_interval: 5s
+    metrics_path: /
+    static_configs:
+      - targets: ['kafka1:9101','kafka2:9102','kafka3:9103','kafka4:9104','kafka5:9105']
+        labels:
+          env: "dev"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: hostname
+        regex: '([^:]+)(:[0-9]+)?'
+        replacement: '${1}'

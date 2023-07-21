@@ -41,7 +41,7 @@ services:
     # - ./jmx-exporter:/usr/share/jmx-exporter
 
   kafka1:
-    image: confluentinc/cp-kafka:7.4.0
+    image: confluentinc/cp-server:7.4.0
     hostname: kafka1
     container_name: kafka1
     depends_on:
@@ -61,7 +61,7 @@ services:
     - ./certs:/opt/certs
 
   kafka2:
-    image: confluentinc/cp-kafka:7.4.0
+    image: confluentinc/cp-server:7.4.0
     hostname: kafka2
     container_name: kafka2
     depends_on:
@@ -81,7 +81,7 @@ services:
     - ./certs:/opt/certs
   
   kafka3:
-    image: confluentinc/cp-kafka:7.4.0
+    image: confluentinc/cp-server:7.4.0
     hostname: kafka3
     container_name: kafka3
     depends_on:
@@ -148,23 +148,22 @@ services:
       - kafka1
       - kafka2
       - kafka3
-      # - schema-registry
-      # - connect
+      - schema-registry
+      - connect
     ports:
       - "9021:9021"
     command: control-center-start /etc/confluent-control-center/control-center-production.properties
     environment:
       PORT: 9021
     volumes:
-    - ./control-center/control-center-production.properties:/etc/control-center/control-center-production.properties
+    - ./control-center/control-center-production.properties:/etc/confluent-control-center/control-center-production.properties
 
   kfkclient:
-    image: confluentinc/cp-kafka:7.4.0
+    build: ./client
     hostname: kfkclient
     container_name: kfkclient
     depends_on:
       - kafka1
-    command: sleep infinity
     volumes:
     - ./client:/opt/client
 

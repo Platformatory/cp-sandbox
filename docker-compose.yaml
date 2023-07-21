@@ -14,31 +14,31 @@ services:
     - ./zookeeper1/zookeeper.properties:/etc/kafka/zookeeper.properties
     - ./jmx-exporter:/usr/share/jmx-exporter
 
-  zookeeper2:
-    image: confluentinc/cp-zookeeper:7.4.0
-    hostname: zookeeper2
-    container_name: zookeeper2
-    ports:
-      - "2182:2182"
-    command: zookeeper-server-start /etc/kafka/zookeeper.properties
-    environment:
-      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
-    volumes:
-    - ./zookeeper2/zookeeper.properties:/etc/kafka/zookeeper.properties
-    - ./jmx-exporter:/usr/share/jmx-exporter
+  # zookeeper2:
+    # image: confluentinc/cp-zookeeper:7.4.0
+    # hostname: zookeeper2
+    # container_name: zookeeper2
+    # ports:
+    #   - "2182:2182"
+    # command: zookeeper-server-start /etc/kafka/zookeeper.properties
+    # environment:
+    #   EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
+    # volumes:
+    # - ./zookeeper2/zookeeper.properties:/etc/kafka/zookeeper.properties
+    # - ./jmx-exporter:/usr/share/jmx-exporter
 
-  zookeeper3:
-    image: confluentinc/cp-zookeeper:7.4.0
-    hostname: zookeeper3
-    container_name: zookeeper3
-    ports:
-      - "2183:2183"
-    command: zookeeper-server-start /etc/kafka/zookeeper.properties
-    environment:
-      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
-    volumes:
-    - ./zookeeper3/zookeeper.properties:/etc/kafka/zookeeper.properties
-    - ./jmx-exporter:/usr/share/jmx-exporter
+  # zookeeper3:
+    # image: confluentinc/cp-zookeeper:7.4.0
+    # hostname: zookeeper3
+    # container_name: zookeeper3
+    # ports:
+    #   - "2183:2183"
+    # command: zookeeper-server-start /etc/kafka/zookeeper.properties
+    # environment:
+    #   EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
+    # volumes:
+    # - ./zookeeper3/zookeeper.properties:/etc/kafka/zookeeper.properties
+    # - ./jmx-exporter:/usr/share/jmx-exporter
 
   kafka1:
     image: confluentinc/cp-kafka:7.4.0
@@ -46,8 +46,8 @@ services:
     container_name: kafka1
     depends_on:
       - zookeeper1
-      - zookeeper2
-      - zookeeper3
+      # - zookeeper2
+      # - zookeeper3
     ports:
       - "29092:29092"
       - "9092:9092"
@@ -58,6 +58,7 @@ services:
     volumes:
     - ./kafka1/server.properties:/etc/kafka/server.properties
     - ./jmx-exporter:/usr/share/jmx-exporter
+    - ./certs:/opt/certs
 
   kafka2:
     image: confluentinc/cp-kafka:7.4.0
@@ -65,8 +66,8 @@ services:
     container_name: kafka2
     depends_on:
       - zookeeper1
-      - zookeeper2
-      - zookeeper3
+      # - zookeeper2
+      # - zookeeper3
     ports:
       - "29093:29093"
       - "9093:9093"
@@ -77,6 +78,7 @@ services:
     volumes:
     - ./kafka2/server.properties:/etc/kafka/server.properties
     - ./jmx-exporter:/usr/share/jmx-exporter
+    - ./certs:/opt/certs
   
   kafka3:
     image: confluentinc/cp-kafka:7.4.0
@@ -84,8 +86,8 @@ services:
     container_name: kafka3
     depends_on:
       - zookeeper1
-      - zookeeper2
-      - zookeeper3
+      # - zookeeper2
+      # - zookeeper3
     ports:
       - "29094:29094"
       - "9094:9094"
@@ -96,6 +98,7 @@ services:
     volumes:
     - ./kafka3/server.properties:/etc/kafka/server.properties
     - ./jmx-exporter:/usr/share/jmx-exporter
+    - ./certs:/opt/certs
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.2.1
@@ -145,8 +148,8 @@ services:
       - kafka1
       - kafka2
       - kafka3
-      - schema-registry
-      - connect
+      # - schema-registry
+      # - connect
     ports:
       - "9021:9021"
     command: control-center-start /etc/confluent-control-center/control-center-production.properties
@@ -154,6 +157,28 @@ services:
       PORT: 9021
     volumes:
     - ./control-center/control-center-production.properties:/etc/control-center/control-center-production.properties
+
+  kfkclient:
+    image: confluentinc/cp-kafka:7.4.0
+    hostname: kfkclient
+    container_name: kfkclient
+    depends_on:
+      - kafka1
+    command: sleep infinity
+    volumes:
+    - ./client:/opt/client
+
+  openldap:
+    image: osixia/openldap:1.3.0
+    hostname: openldap
+    container_name: openldap
+    environment:
+        LDAP_ORGANISATION: "ConfluentDemo"
+        LDAP_DOMAIN: "confluentdemo.io"
+        LDAP_BASE_DN: "dc=confluentdemo,dc=io"
+    volumes:
+        - ./ldap/ldap_users:/container/service/slapd/assets/config/bootstrap/ldif/custom
+    command: "--copy-service --loglevel debug"
 
   prometheus:
     image: prom/prometheus:v2.37.7
@@ -192,3 +217,8 @@ services:
 volumes:
     prometheus_data: {}
     grafana_data: {}
+
+# RBAC image
+# Generic producer/consumer/troubleshooting kit
+# LDAP
+

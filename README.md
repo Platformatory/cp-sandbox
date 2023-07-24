@@ -18,7 +18,7 @@ Check the kafka server.properties for more details about the Kafka setup.
 
 Check if all components are up and running using
 
-```
+```bash
 docker-compose ps -a
 # Ensure there are no Exited services and all containers have the status `Up`
 ```

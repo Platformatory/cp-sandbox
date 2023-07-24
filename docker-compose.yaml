@@ -1,5 +1,5 @@
 ---
-version: '2'
+version: '3.7'
 services:
   zookeeper1:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -11,13 +11,13 @@ services:
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
     volumes:
-    - ./zookeeper1/zookeeper.properties:/etc/kafka/zookeeper.properties
+    - ./zookeeper1:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
     deploy:
       resources:
         limits:
-          cpus: "0.5"
-          memory: 256M
+          cpus: "1"
+          memory: 512M
 
   # zookeeper2:
     # image: confluentinc/cp-zookeeper:7.4.0
@@ -29,7 +29,7 @@ services:
     # environment:
     #   EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
     # volumes:
-    # - ./zookeeper2/zookeeper.properties:/etc/kafka/zookeeper.properties
+    # - ./zookeeper2:/etc/kafka
     # - ./jmx-exporter:/usr/share/jmx-exporter
 
   # zookeeper3:
@@ -42,7 +42,7 @@ services:
     # environment:
     #   EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
     # volumes:
-    # - ./zookeeper3/zookeeper.properties:/etc/kafka/zookeeper.properties
+    # - ./zookeeper3:/etc/kafka
     # - ./jmx-exporter:/usr/share/jmx-exporter
 
   kafka1:
@@ -57,13 +57,15 @@ services:
       - "29092:29092"
       - "9092:9092"
       - "9101:9101"
+      - "8090:8090"
+    expose:
+      - 19092
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9101:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
-    - ./kafka1/server.properties:/etc/kafka/server.properties
+    - ./kafka1:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
-    - ./certs:/opt/certs
     deploy:
       resources:
         limits:
@@ -82,13 +84,15 @@ services:
       - "29093:29093"
       - "9093:9093"
       - "9102:9102"
+      - "8091:8091"
+    expose:
+      - 19093
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9102:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
-    - ./kafka2/server.properties:/etc/kafka/server.properties
+    - ./kafka2:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
-    - ./certs:/opt/certs
     deploy:
       resources:
         limits:
@@ -107,13 +111,15 @@ services:
       - "29094:29094"
       - "9094:9094"
       - "9103:9103"
+      - "8092:8092"
+    expose:
+      - 19094
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
-    - ./kafka3/server.properties:/etc/kafka/server.properties
+    - ./kafka3:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
-    - ./certs:/opt/certs
     deploy:
       resources:
         limits:
@@ -156,14 +162,7 @@ services:
     ports:
       - "8083:8083"
     volumes:
-    - ./connect/connect-distributed.properties:/etc/kafka/connect-distributed.properties
-    # environment:
-      # CLASSPATH required due to CC-2422
-      # CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.2.1.jar
-      # CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
-      # CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
-      # CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
-      # CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+    - ./connect:/etc/kafka
     deploy:
       resources:
         limits:
@@ -186,7 +185,7 @@ services:
     environment:
       PORT: 9021
     volumes:
-    - ./control-center/control-center-production.properties:/etc/confluent-control-center/control-center-production.properties
+    - ./confluent-control-center:/etc/confluent-control-center
     deploy:
       resources:
         limits:
@@ -272,8 +271,4 @@ services:
 volumes:
     prometheus_data: {}
     grafana_data: {}
-
-# RBAC image
-# Generic producer/consumer/troubleshooting kit
-# LDAP
 

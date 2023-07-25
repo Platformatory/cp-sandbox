@@ -142,7 +142,7 @@ services:
     ports:
       - "8081:8081"
     volumes:
-    - ./schema-registry/schema-registry.properties:/etc/schema-registry/schema-registry.properties
+    - ./schema-registry:/etc/schema-registry
     deploy:
       resources:
         limits:

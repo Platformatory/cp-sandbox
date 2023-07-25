@@ -66,6 +66,7 @@ services:
     volumes:
     - ./kafka1:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
+    - ./1/conf:/tmp/conf
     deploy:
       resources:
         limits:
@@ -214,6 +215,8 @@ services:
         LDAP_ORGANISATION: "ConfluentDemo"
         LDAP_DOMAIN: "confluentdemo.io"
         LDAP_BASE_DN: "dc=confluentdemo,dc=io"
+    ports:
+      - "389:389"
     volumes:
         - ./ldap/ldap_users:/container/service/slapd/assets/config/bootstrap/ldif/custom
     command: "--copy-service --loglevel debug"

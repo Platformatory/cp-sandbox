@@ -53,13 +53,6 @@ services:
       - zookeeper1
       # - zookeeper2
       # - zookeeper3
-    ports:
-      - "29092:29092"
-      - "9092:9092"
-      - "9101:9101"
-      - "8090:8090"
-    expose:
-      - 19092
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9101:/usr/share/jmx-exporter/kafka_broker.yml
@@ -80,13 +73,6 @@ services:
       - zookeeper1
       # - zookeeper2
       # - zookeeper3
-    ports:
-      - "29093:29093"
-      - "9093:9093"
-      - "9102:9102"
-      - "8091:8091"
-    expose:
-      - 19093
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9102:/usr/share/jmx-exporter/kafka_broker.yml
@@ -107,13 +93,6 @@ services:
       - zookeeper1
       # - zookeeper2
       # - zookeeper3
-    ports:
-      - "29094:29094"
-      - "9094:9094"
-      - "9103:9103"
-      - "8092:8092"
-    expose:
-      - 19094
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/kafka_broker.yml
@@ -134,10 +113,6 @@ services:
       - kafka1
       - kafka2
       - kafka3
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka1:29092'
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
     command: schema-registry-start /etc/schema-registry/schema-registry.properties
     ports:
       - "8081:8081"

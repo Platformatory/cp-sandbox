@@ -71,3 +71,9 @@ kafka-console-consumer --bootstrap-server kafka1:19092 --consumer.config /opt/cl
 
 The client is using SASL/PLAIN over PLAINTEXT with the user `bob` and acks=1
 
+The error message seen in the console producer and consumer fro `domestic_orders` - 
+
+```
+WARN [Producer clientId=console-producer] Connection to node 2 (kafka2/172.20.0.6:19093) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)
+```
+

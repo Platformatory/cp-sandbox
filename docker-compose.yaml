@@ -74,11 +74,14 @@ services:
       # - zookeeper2
       # - zookeeper3
     command: kafka-server-start /etc/kafka/server.properties
+    storage_opt:
+      size: '512M'
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9102:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
     - ./kafka2:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
+    - kafka2data:/var/lib/kafka/data
     deploy:
       resources:
         limits:
@@ -248,4 +251,9 @@ services:
 volumes:
     prometheus_data: {}
     grafana_data: {}
+    kafka2data:
+      driver_opts:
+        type: tmpfs
+        o: size=3145728
+        device: tmpfs
 

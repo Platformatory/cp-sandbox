@@ -50,3 +50,21 @@ docker-compose restart <service_name> # docker-compose restart kafka1
 docker-compose up -d --force-recreate <service_name> # docker-compose up -d --force-recreate kafka1
 ```
 
+# Scenario 12
+
+> **Before starting ensure that there are no other versions of the sandbox running**
+> Run `docker-compose down -v` before starting
+
+1. Start the scenario with `docker-compose up -d`
+2. Wait for all services to be up and healthy `docker-compose ps`
+3. Wait for the topics to be created. Check the control center(localhost:9021) to see if the topics - `clickstream` is created
+
+## Problem Statement
+
+The client is unable to produce to the `clickstream` topic using the command -
+
+```
+kafka-console-producer --bootstrap-server kafka1:19092 --producer.config /opt/client/client.properties --topic clickstream
+```
+
+The client is using SASL/PLAIN over PLAINTEXT with the user `bob` and acks=1

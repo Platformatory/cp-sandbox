@@ -50,3 +50,24 @@ docker-compose restart <service_name> # docker-compose restart kafka1
 docker-compose up -d --force-recreate <service_name> # docker-compose up -d --force-recreate kafka1
 ```
 
+# Scenario 10
+
+> **Before starting ensure that there are no other versions of the sandbox running**
+> Run `docker-compose down -v` before starting
+
+1. Start the scenario with `docker-compose up -d`
+2. Wait for all services to be up and healthy `docker-compose ps`
+3. Wait for the topics to be created. Check the control center(localhost:9021) to see if the topics - `domestic_orders` and `international_orders` are created
+
+## Problem Statement
+
+The client is able to produce to the `international_orders` topic but receives an error while producing and consuming from `domestic_orders` using the following commands -
+
+```
+kafka-console-producer --bootstrap-server kafka1:19092 --producer.config /opt/client/client.properties --topic <topic>
+
+kafka-console-consumer --bootstrap-server kafka1:19092 --consumer.config /opt/client/client.properties --from-beginning --topic <topic> 
+```
+
+The client is using SASL/PLAIN over PLAINTEXT with the user `bob` and acks=1
+

@@ -171,8 +171,11 @@ services:
     build: ./client
     hostname: kfkclient
     container_name: kfkclient
+    entrypoint: /opt/client/setup.sh
     depends_on:
       - kafka1
+      - kafka2
+      - kafka3
     volumes:
     - ./client:/opt/client
     deploy:

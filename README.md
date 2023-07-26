@@ -50,3 +50,32 @@ docker-compose restart <service_name> # docker-compose restart kafka1
 docker-compose up -d --force-recreate <service_name> # docker-compose up -d --force-recreate kafka1
 ```
 
+# Scenario 2
+
+> **Before starting ensure that there are no other versions of the sandbox running**
+> Run `docker-compose down -v` before starting
+
+1. Start the scenario with `docker-compose up -d`
+2. Wait for all services to be up and healthy `docker-compose ps`
+3. Wait for the topics to be created. Check the control center(localhost:9021) to see if the topic `europe_orders` is created
+
+## Problem Statement
+
+The client has created a new topic `europe_orders` but is unable to produce/consume from the topic from the host `kfkclient` using the user `kfkclient1` using the following commands -
+
+```
+kafka-console-producer --bootstrap-server kafka1:19092 --producer.config /opt/client/client.properties --topic europe_orders
+
+kafka-console-consumer --bootstrap-server kafka1:19092 --consumer.config /opt/client/client.properties --from-beginning --topic europe_orders
+```
+
+The client is using SASL/PLAIN over PLAINTEXT with the user `kfkclient1`
+
+The error message seen in the console producer and consumer for `europe_orders` - 
+
+```
+[2023-07-26 12:18:20,309] WARN [Producer clientId=console-producer] Error while fetching metadata with correlation id 4 : {europe_payments=TOPIC_AUTHORIZATION_FAILED} (org.apache.kafka.clients.NetworkClient)
+[2023-07-26 12:18:20,409] ERROR [Producer clientId=console-producer] Topic authorization failed for topics [europe_payments] (org.apache.kafka.clients.Metadata)
+[2023-07-26 12:18:20,411] ERROR Error when sending message to topic europe_payments with key: null, value: 6 bytes with error: (org.apache.kafka.clients.producer.internals.ErrorLoggingCallback)
+org.apache.kafka.common.errors.TopicAuthorizationException: Not authorized to access topics: [europe_payments]
+```

@@ -50,3 +50,30 @@ docker-compose restart <service_name> # docker-compose restart kafka1
 docker-compose up -d --force-recreate <service_name> # docker-compose up -d --force-recreate kafka1
 ```
 
+# Scenario 3
+
+> **Before starting ensure that there are no other versions of the sandbox running**
+> Run `docker-compose down -v` before starting
+
+1. Start the scenario with `docker-compose up -d`
+2. Wait for all services to be up and healthy `docker-compose ps`
+
+## Problem Statement
+
+The client is unable to interact with the cluster using `kafka-topics`, `kafka-console-producer` or `kafka-console-consumer` using the super user `bob`(password - `bob-secret`) with some of the kakfa brokers as the bootstrap server. Only one of the kafka broker works as the bootstrap server.
+
+The error message when using kafka2 or kafka3 as the bootstrap-server
+
+```
+[2023-07-26 13:20:58,720] ERROR [AdminClient clientId=adminclient-1] Connection to node 3 (kafka3/192.168.112.8:39092) failed authentication due to: Authentication failed: Invalid username or password (org.apache.kafka.clients.NetworkClient)
+[2023-07-26 13:20:58,722] WARN [AdminClient clientId=adminclient-1] Metadata update failed due to authentication error (org.apache.kafka.clients.admin.internals.AdminMetadataManager)
+org.apache.kafka.common.errors.SaslAuthenticationException: Authentication failed: Invalid username or password
+Error while executing topic command : Authentication failed: Invalid username or password
+[2023-07-26 13:20:58,907] ERROR org.apache.kafka.common.errors.SaslAuthenticationException: Authentication failed: Invalid username or password
+```
+
+Commands ran on the `kfkclient` host
+
+```bash
+kafka-topics --bootstrap-server <broker>:<port> --command-config /opt/client/client.properties --list
+```

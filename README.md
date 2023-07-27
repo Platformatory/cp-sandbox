@@ -61,7 +61,7 @@ docker-compose up -d --force-recreate <service_name> # docker-compose up -d --fo
 
 ## Problem Statement
 
-The client has created a new topic `europe_orders` but is unable to produce/consume from the topic from the host `kfkclient` using the user `kfkclient1` using the following commands -
+The client has created a new topic `europe_orders` but is unable to produce/consume from the topic from the host `kfkclient` using the user `kafkaclient1` using the following commands -
 
 ```
 kafka-console-producer --bootstrap-server kafka1:19092 --producer.config /opt/client/client.properties --topic europe_orders
@@ -69,7 +69,7 @@ kafka-console-producer --bootstrap-server kafka1:19092 --producer.config /opt/cl
 kafka-console-consumer --bootstrap-server kafka1:19092 --consumer.config /opt/client/client.properties --from-beginning --topic europe_orders
 ```
 
-The client is using SASL/PLAIN over PLAINTEXT with the user `kfkclient1`
+The client is using SASL/PLAIN over PLAINTEXT with the user `kafkaclient1`
 
 The error message seen in the console producer and consumer for `europe_orders` - 
 

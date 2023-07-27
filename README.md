@@ -57,21 +57,21 @@ docker-compose up -d --force-recreate <service_name> # docker-compose up -d --fo
 
 1. Start the scenario with `docker-compose up -d`
 2. Wait for all services to be up and healthy `docker-compose ps`
-3. Wait for the topics to be created. Check the control center(localhost:9021) to see if the topic `europe_orders` is created
+3. Wait for the topics to be created. Check the control center(localhost:9021) to see if the topic `europe_payments` is created
 
 ## Problem Statement
 
-The client has created a new topic `europe_orders` but is unable to produce/consume from the topic from the host `kfkclient` using the user `kafkaclient1` using the following commands -
+The client has created a new topic `europe_payments` but is unable to produce/consume from the topic from the host `kfkclient` using the user `kafkaclient1` using the following commands -
 
 ```
-kafka-console-producer --bootstrap-server kafka1:19092 --producer.config /opt/client/client.properties --topic europe_orders
+kafka-console-producer --bootstrap-server kafka1:19092 --producer.config /opt/client/client.properties --topic europe_payments
 
-kafka-console-consumer --bootstrap-server kafka1:19092 --consumer.config /opt/client/client.properties --from-beginning --topic europe_orders
+kafka-console-consumer --bootstrap-server kafka1:19092 --consumer.config /opt/client/client.properties --from-beginning --topic europe_payments
 ```
 
 The client is using SASL/PLAIN over PLAINTEXT with the user `kafkaclient1`
 
-The error message seen in the console producer and consumer for `europe_orders` - 
+The error message seen in the console producer and consumer for `europe_payments` - 
 
 ```
 [2023-07-26 12:18:20,309] WARN [Producer clientId=console-producer] Error while fetching metadata with correlation id 4 : {europe_payments=TOPIC_AUTHORIZATION_FAILED} (org.apache.kafka.clients.NetworkClient)

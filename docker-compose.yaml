@@ -49,6 +49,10 @@ services:
     image: confluentinc/cp-server:7.4.0
     hostname: kafka1
     container_name: kafka1
+    user: root
+    entrypoint: /opt/scripts/kafka1.sh
+    cap_add:
+      - NET_ADMIN
     depends_on:
       - zookeeper1
       # - zookeeper2
@@ -59,6 +63,7 @@ services:
     volumes:
     - ./kafka1:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
+    - ./scripts/kafka1.sh:/opt/scripts/kafka1.sh
     deploy:
       resources:
         limits:
@@ -171,8 +176,11 @@ services:
     build: ./client
     hostname: kfkclient
     container_name: kfkclient
+    entrypoint: /opt/client/setup.sh
     depends_on:
       - kafka1
+      - kafka2
+      - kafka3
     volumes:
     - ./client:/opt/client
     deploy:

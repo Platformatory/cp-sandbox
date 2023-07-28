@@ -50,3 +50,16 @@ docker-compose restart <service_name> # docker-compose restart kafka1
 docker-compose up -d --force-recreate <service_name> # docker-compose up -d --force-recreate kafka1
 ```
 
+# Scenario 1
+
+> **Before starting ensure that there are no other versions of the sandbox running**
+> Run `docker-compose down -v` before starting
+
+1. Start the scenario with `docker-compose up -d`
+2. Wait for all services to be up and healthy `docker-compose ps`
+
+## Problem Statement
+
+The client notices that the connect cluster is down on control-center(localhost:9021). This is after an security audit removed some users from the super users list.
+
+Troubleshoot and provide a secure solution for the client.

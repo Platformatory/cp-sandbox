@@ -5,8 +5,6 @@ services:
     image: confluentinc/cp-zookeeper:7.4.0
     hostname: zookeeper1
     container_name: zookeeper1
-    ports:
-      - "2181:2181"
     command: zookeeper-server-start /etc/kafka/zookeeper.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml

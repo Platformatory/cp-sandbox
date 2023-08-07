@@ -53,7 +53,7 @@ services:
       - zookeeper1
       # - zookeeper2
       # - zookeeper3
-    command: kafka-server-start /etc/kafka/server.properties
+    command: kafka-server-start /etc/kafka/server.properties && sleep infinity
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9101:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
@@ -73,7 +73,7 @@ services:
       - zookeeper1
       # - zookeeper2
       # - zookeeper3
-    command: kafka-server-start /etc/kafka/server.properties
+    command: kafka-server-start /etc/kafka/server.properties && sleep infinity
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9102:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
@@ -93,7 +93,7 @@ services:
       - zookeeper1
       # - zookeeper2
       # - zookeeper3
-    command: kafka-server-start /etc/kafka/server.properties
+    command: kafka-server-start /etc/kafka/server.properties && sleep infinity
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:

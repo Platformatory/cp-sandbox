@@ -23,6 +23,12 @@ docker-compose ps -a
 # Ensure there are no Exited services and all containers have the status `Up`
 ```
 
+Check the broker health by exec into the broker containers and running
+
+```bash
+ps aux | grep kafka
+```
+
 
 ### Client
 

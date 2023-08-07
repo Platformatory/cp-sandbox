@@ -23,13 +23,6 @@ docker-compose ps -a
 # Ensure there are no Exited services and all containers have the status `Up`
 ```
 
-Check the broker health by exec into the broker containers and running
-
-```bash
-ps aux | grep kafka
-```
-
-
 ### Client
 
 To use a kafka client, exec into the `kfkclient` container which contains the Kafka CLI and other tools necessary for troubleshooting Kafka. THe `kfkclient` container also contains a properties file mounted to `/opt/client`, which can be used to define the client properties for communicating with Kafka.
@@ -64,7 +57,6 @@ docker-compose up -d --force-recreate <service_name> # docker-compose up -d --fo
 1. Start the scenario with `docker-compose up -d`
 2. Wait for all services to be up and healthy `docker-compose ps`
 
-**Please note that in this scenario, healthy containers does not mean healthy kafka brokers. Please check the [health](#health) section above for more details**
 
 ## Problem Statement
 

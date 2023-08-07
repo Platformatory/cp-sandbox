@@ -56,3 +56,41 @@ docker-compose restart <service_name> # docker-compose restart kafka1
 docker-compose up -d --force-recreate <service_name> # docker-compose up -d --force-recreate kafka1
 ```
 
+# Scenario 8
+
+> **Before starting ensure that there are no other versions of the sandbox running**
+> Run `docker-compose down -v` before starting
+
+1. Start the scenario with `docker-compose up -d`
+2. Wait for all services to be up and healthy `docker-compose ps`
+
+**Please note that in this scenario, healthy containers does not mean healthy kafka brokers. Please check the [health](#health) section above for more details**
+
+## Problem Statement
+
+The kafka brokers are down after an upgrade to a newer version. Several properties and files were changed during the upgrade and the customer does not have an audit of the changes.
+
+Review the logs and come up with a solution to start the kafka brokers.
+
+```
+org.apache.kafka.common.config.ConfigException: Invalid value javax.net.ssl.SSLHandshakeException: Empty client certificate chain for configuration A client SSLEngine created with the provided settings can't connect to a server SSLEngine created with those settings.
+	at org.apache.kafka.common.security.ssl.SslFactory.configure(SslFactory.java:103)
+	at org.apache.kafka.common.network.SslChannelBuilder.configure(SslChannelBuilder.java:84)
+	at org.apache.kafka.common.network.ChannelBuilders.create(ChannelBuilders.java:265)
+	at org.apache.kafka.common.network.ChannelBuilders.serverChannelBuilder(ChannelBuilders.java:166)
+	at kafka.network.Processor.<init>(SocketServer.scala:1177)
+	at kafka.network.Acceptor.newProcessor(SocketServer.scala:1050)
+	at kafka.network.Acceptor.$anonfun$addProcessors$1(SocketServer.scala:1010)
+	at scala.collection.immutable.Range.foreach$mVc$sp(Range.scala:190)
+	at kafka.network.Acceptor.addProcessors(SocketServer.scala:1009)
+	at kafka.network.DataPlaneAcceptor.configure(SocketServer.scala:670)
+	at kafka.network.SocketServer.createDataPlaneAcceptorAndProcessors(SocketServer.scala:278)
+	at kafka.network.SocketServer.$anonfun$new$51(SocketServer.scala:224)
+	at kafka.network.SocketServer.$anonfun$new$51$adapted(SocketServer.scala:224)
+	at scala.collection.IterableOnceOps.foreach(IterableOnce.scala:575)
+	at scala.collection.IterableOnceOps.foreach$(IterableOnce.scala:573)
+	at scala.collection.AbstractIterable.foreach(Iterable.scala:933)
+	at kafka.network.SocketServer.<init>(SocketServer.scala:224)
+	at kafka.server.KafkaServer.startup(KafkaServer.scala:528)
+	at kafka.Kafka$.main(Kafka.scala:114)
+```

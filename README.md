@@ -1,6 +1,6 @@
 # kafka-jmx-grafana-docker
 
-Docker-compose file for Confluent Kafka with configuration mounted as properties files. Brings up Kafka and components with JMX metrics exposed and visualized using Prometheus and Grafana
+Docker-compose file for Confluent Kafka with configuration mounted as properties files. Brings up Kafka and components with JMX metrics exposed and visualized using Prometheus and Grafana. The environment simulates running Confluent Platform on VMs/Bare metal servers using properties files but using docker containers. The various branches in the repository contains troubleshooting scenarios for Kafka adminstrators to practice production-like issues.
 
 ## Start
 

@@ -50,3 +50,27 @@ docker-compose restart <service_name> # docker-compose restart kafka1
 docker-compose up -d --force-recreate <service_name> # docker-compose up -d --force-recreate kafka1
 ```
 
+# Scenario 18
+
+> Before starting ensure that there are no other versions of the sandbox running Run `docker-compose down -v` before starting
+
+1. Start the scenario with docker-compose up -d
+2. Wait for all services to be up and healthy `docker-compose ps -a`
+3. **Wait for the `init` container to exit. It should exit with code 0. This should take a while, depending on your system.** (You can run `watch docker-compose ps -a`)
+4. Verify that the following topics are created through the CLI or control center
+- debit_transactions
+- credit_transactions
+- loan_payments
+- new_accounts
+- fraud_detection
+- business_requests
+- account_audit
+- clickstream
+- international_transactions
+- app_telemetry
+
+## Problem Statement
+
+The customer notices a red color for one of the panels in the control-center. Troubleshoot the cause for the red color in the control-center and propose a solution to fix the issue.
+
+![img](control-center.png)

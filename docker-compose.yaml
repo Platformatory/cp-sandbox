@@ -1,17 +1,15 @@
 ---
 version: '3.7'
 services:
-  zookeeper1:
+  zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
-    hostname: zookeeper1
-    container_name: zookeeper1
-    ports:
-      - "2181:2181"
+    hostname: zookeeper
+    container_name: zookeeper
     command: zookeeper-server-start /etc/kafka/zookeeper.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
     volumes:
-    - ./zookeeper1:/etc/kafka
+    - ./zookeeper:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
     deploy:
       resources:
@@ -19,40 +17,12 @@ services:
           cpus: "1"
           memory: 512M
 
-  # zookeeper2:
-    # image: confluentinc/cp-zookeeper:7.4.0
-    # hostname: zookeeper2
-    # container_name: zookeeper2
-    # ports:
-    #   - "2182:2182"
-    # command: zookeeper-server-start /etc/kafka/zookeeper.properties
-    # environment:
-    #   EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
-    # volumes:
-    # - ./zookeeper2:/etc/kafka
-    # - ./jmx-exporter:/usr/share/jmx-exporter
-
-  # zookeeper3:
-    # image: confluentinc/cp-zookeeper:7.4.0
-    # hostname: zookeeper3
-    # container_name: zookeeper3
-    # ports:
-    #   - "2183:2183"
-    # command: zookeeper-server-start /etc/kafka/zookeeper.properties
-    # environment:
-    #   EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
-    # volumes:
-    # - ./zookeeper3:/etc/kafka
-    # - ./jmx-exporter:/usr/share/jmx-exporter
-
   kafka1:
     image: confluentinc/cp-server:7.4.0
     hostname: kafka1
     container_name: kafka1
     depends_on:
-      - zookeeper1
-      # - zookeeper2
-      # - zookeeper3
+      - zookeeper
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9101:/usr/share/jmx-exporter/kafka_broker.yml
@@ -70,9 +40,7 @@ services:
     hostname: kafka2
     container_name: kafka2
     depends_on:
-      - zookeeper1
-      # - zookeeper2
-      # - zookeeper3
+      - zookeeper
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9102:/usr/share/jmx-exporter/kafka_broker.yml
@@ -90,9 +58,7 @@ services:
     hostname: kafka3
     container_name: kafka3
     depends_on:
-      - zookeeper1
-      # - zookeeper2
-      # - zookeeper3
+      - zookeeper
     command: kafka-server-start /etc/kafka/server.properties
     environment:
       EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/kafka_broker.yml
@@ -124,26 +90,6 @@ services:
           cpus: "1"
           memory: 512M
 
-  connect:
-    image: confluentinc/cp-server-connect:7.4.0
-    hostname: connect
-    container_name: connect
-    depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-      - schema-registry
-    command: connect-distributed /etc/kafka/connect-distributed.properties
-    ports:
-      - "8083:8083"
-    volumes:
-    - ./connect:/etc/kafka
-    deploy:
-      resources:
-        limits:
-          cpus: "2"
-          memory: 2048M
-
   control-center:
     image: confluentinc/cp-enterprise-control-center:7.4.0
     hostname: control-center
@@ -153,7 +99,6 @@ services:
       - kafka2
       - kafka3
       - schema-registry
-      - connect
     ports:
       - "9021:9021"
     command: control-center-start /etc/confluent-control-center/control-center-production.properties
@@ -173,8 +118,272 @@ services:
     container_name: kfkclient
     depends_on:
       - kafka1
+      - kafka2
+      - kafka3
     volumes:
     - ./client:/opt/client
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  init:
+    build: ./client
+    hostname: init
+    container_name: init
+    entrypoint: /opt/scripts/command.sh /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    restart: on-failure
+    volumes:
+    - ./scripts/start.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  producer1:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer1
+    container_name: producer1
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic app_telemetry \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  producer2:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer2
+    container_name: producer2
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic debit_transactions \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+  
+  producer3:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer3
+    container_name: producer3
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic credit_transactions \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  producer4:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer4
+    container_name: producer4
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic loan_payments \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  producer5:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer5
+    container_name: producer5
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic new_accounts \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  producer6:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer6
+    container_name: producer6
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic business_requests \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  producer7:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer7
+    container_name: producer7
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic international_transactions \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  producer8:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer8
+    container_name: producer8
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic account_audit \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  producer9:
+    image: confluentinc/cp-server:7.4.0
+    hostname: producer9
+    container_name: producer9
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    command: kafka-producer-perf-test \
+              --topic fraud_detection \
+              --num-records 99999999999 \
+              --throughput -1 \
+              --record-size 10000 \
+              --producer.config  /opt/client/client.properties
+    volumes:
+    - ./producer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 256M
+
+  consumer:
+    build: ./consumer
+    hostname: consumer
+    container_name: consumer
+    entrypoint: /opt/scripts/kafka.sh
+    depends_on:
+      - producer1
+    command: java -jar  app.jar /opt/client/client.properties
+    volumes:
+    - ./consumer/client.properties:/opt/client/client.properties
+    - ./scripts/setup.sh:/opt/scripts/kafka.sh
+    - ./scripts/client.sh:/opt/scripts/command.sh
     deploy:
       resources:
         limits:

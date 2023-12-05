@@ -105,44 +105,6 @@ services:
           cpus: "1.5"
           memory: 1536M
 
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.4.0
-    hostname: schema-registry
-    container_name: schema-registry
-    depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-    command: schema-registry-start /etc/schema-registry/schema-registry.properties
-    ports:
-      - "8081:8081"
-    volumes:
-    - ./schema-registry:/etc/schema-registry
-    deploy:
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
-
-  connect:
-    image: confluentinc/cp-server-connect:7.4.0
-    hostname: connect
-    container_name: connect
-    depends_on:
-      - kafka1
-      - kafka2
-      - kafka3
-      - schema-registry
-    command: connect-distributed /etc/kafka/connect-distributed.properties
-    ports:
-      - "8083:8083"
-    volumes:
-    - ./connect:/etc/kafka
-    deploy:
-      resources:
-        limits:
-          cpus: "2"
-          memory: 2048M
 
   control-center:
     image: confluentinc/cp-enterprise-control-center:7.4.0
@@ -152,8 +114,6 @@ services:
       - kafka1
       - kafka2
       - kafka3
-      - schema-registry
-      - connect
     ports:
       - "9021:9021"
     command: control-center-start /etc/confluent-control-center/control-center-production.properties
@@ -202,53 +162,4 @@ services:
         limits:
           cpus: "0.1"
           memory: 256M
-
-  prometheus:
-    image: prom/prometheus:v2.37.7
-    container_name: prometheus
-    volumes:
-      - ./prometheus:/etc/prometheus
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
-    restart: unless-stopped
-    ports:
-    - 9090:9090
-    expose:
-    - 9090
-    deploy:
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 256M
-
-  grafana:
-    image: grafana/grafana:8.5.24
-    container_name: grafana
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-    environment:
-      - GF_SECURITY_ADMIN_USER=${ADMIN_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - GF_USERS_ALLOW_SIGN_UP=false
-    restart: unless-stopped
-    ports:
-    - 3000:3000
-    expose:
-      - 3000
-    deploy:
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 256M
-
-volumes:
-    prometheus_data: {}
-    grafana_data: {}
 

@@ -12,6 +12,25 @@ docker-compose up -d
 
 The docker-compose file brings up 3 node kafka cluster with security enabled. Each service in the compose file has its properties/configurations mounted as a volume from a directory with the same name as the service.
 
+## About the cluster
+
+The cluster contains the following resources deployed - 
+
+- 1 zookeeper
+- 3 kafka brokers
+- ldap server
+- control center
+- kafka client container
+
+### Kafka configuration
+
+The Kafka brokers have 3 listeners - 
+- CLIENT (For external clients) - Uses SASL/PLAIN over PLAINTEXT for security
+- BROKER (For inter broker) - Uses mTLS for security
+- TOKEN (For internal components) - USES SASL/OAUTHBEAER over PLAINTEXT for security
+
+The cluster has both ACLs and RBAC enabled with LDAP.
+
 Check the kafka server.properties for more details about the Kafka setup.
 
 ### Health
@@ -57,7 +76,7 @@ docker-compose up -d --force-recreate <service_name> # docker-compose up -d --fo
 
 1. Start the scenario with `docker-compose up -d`
 2. Wait for all services to be up and healthy `docker-compose ps -a`
-3. Wait for the topics to be created. Check the control center(localhost:9021) to see if the topics - `domestic_orders` and `international_orders` are created
+3. Wait for the topics to be created. Check the control center(localhost:9021) to see if the topics - `domestic_orders` and `international_orders` are created. This will take a while for the control center to come up and for the creation of the topics. Approximately, 5-10 mins. If the control center is in a exited state, try bringing it up using `docker-compose up -d control-center`. The control center can go down initially before the brokers have come up.
 
 ## Problem Statement
 

@@ -50,4 +50,4 @@ docker-compose restart <service_name> # docker-compose restart kafka1
 docker-compose up -d --force-recreate <service_name> # docker-compose up -d --force-recreate kafka1
 ```
 
-Note: CA Password: kafka-ca
+Note: CA key Password: kafka-ca

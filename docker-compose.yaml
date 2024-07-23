@@ -9,7 +9,7 @@ services:
       - "2181:2181"
     command: zookeeper-server-start /etc/kafka/zookeeper.properties
     environment:
-      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
+      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.20.0.jar=9103:/usr/share/jmx-exporter/zookeeper.yml
     volumes:
     - ./zookeeper1:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
@@ -55,7 +55,7 @@ services:
       # - zookeeper3
     command: kafka-server-start /etc/kafka/server.properties
     environment:
-      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9101:/usr/share/jmx-exporter/kafka_broker.yml
+      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.20.0.jar=9101:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
     - ./kafka1:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
@@ -75,7 +75,7 @@ services:
       # - zookeeper3
     command: kafka-server-start /etc/kafka/server.properties
     environment:
-      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9102:/usr/share/jmx-exporter/kafka_broker.yml
+      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.20.0.jar=9102:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
     - ./kafka2:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
@@ -95,7 +95,7 @@ services:
       # - zookeeper3
     command: kafka-server-start /etc/kafka/server.properties
     environment:
-      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.18.0.jar=9103:/usr/share/jmx-exporter/kafka_broker.yml
+      EXTRA_ARGS: -javaagent:/usr/share/jmx-exporter/jmx_prometheus_javaagent-0.20.0.jar=9103:/usr/share/jmx-exporter/kafka_broker.yml
     volumes:
     - ./kafka3:/etc/kafka
     - ./jmx-exporter:/usr/share/jmx-exporter
@@ -248,4 +248,3 @@ services:
 volumes:
     prometheus_data: {}
     grafana_data: {}
-
